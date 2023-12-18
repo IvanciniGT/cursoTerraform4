@@ -159,7 +159,7 @@ En esos archivos vamos a encontrar distintos tipos de elementos configurados:
 - provider: Dar la configuración de esos proveedores de recursos.                                   LUNES
 - resource: Definir los recursos que queremos gestionar.                                            LUNES
   
-- output                                                                                            MARTES
+- output:   Permiten extraer información de los recursos para pasarla a otros programas                                                                                       MARTES
 - variable... no son variables al uso... como las que definimos cuando                              MARTES / MIÉRCOLES
               trabajos con la bash, py... java...
                 Parámetros / Argumentos de entrada al script
@@ -344,3 +344,74 @@ Por qué vamos a usar contenedores en local en lugar de servidores en clouds?
 Entorno aislado (en un SO con kernel Linux) donde ejecutar procesos.
 
 VM: Entorno aislado donde ejecutar procesos, con su propio SO <> con los contenedores, en los que no puedo tener un SO (se usa el del host).
+
+---
+
+# Tipos de datos en terraform:
+
+- String: Los ponemos entre comillas: "hola"
+- Number: Los escribo tal cual: 17
+- Boolean: Escribo true o false, sin comillas ni nada
+- Set(???): Colección secuencial de objetos/datos.
+            Puedo acceder a los datos de un set iterando sobre ellos (FOR-EACH)       
+    Set(String): ["texto","texto2"]
+    Set(Boolean): [true, true, false]
+- List(???): Colección secuencial de objetos/datos.
+            Puedo acceder a los datos de un lista iterando sobre ellos (FOR-EACH)
+            pero además, en base a su posición en la lista: milista[3]
+    List(String): ["texto","texto2"]
+    List(Boolean): [true, true, false]
+- Map(???): colección secuencial de objetos/datos.
+            Puedo acceder a los datos de un mapa iterando sobre ellos (FOR-EACH)
+            pero además, a traves de una clave que he de asociar a cada valor
+                mi_mapa["clave1"]
+    Map(String): {
+                    "clave1" = "texto"
+                    "clave2" = "texto2"
+                 }    
+    Map(Boolean): {
+                    "clave1" = true
+                    "clave2" = false
+                 }
+    Las claves en los mapas siempre son textos.
+---
+Y además están los blocks... que van por otro lao!
+Loa blocks los vamos a encontrar como Block List o Block Set
+Un block es similar a un map.... pero:
+- Tienen un esquema asociado... es decir, las claves que pongo dentro del block vienen prefijadas... 
+- No se usa el igual a la hora de separar la propiedad del valor
+---
+
+NOTA: NUNCA JAMAS EN LA VIDA hay que leer "los datos del bloque resources" del fichero terraform.tfstate... 
+ni usar los datos de salida del terraform show o terraform state show para nada... 
+Ni para extraer datos de monitorización ni ostias parecidas.
+
+Esto es una muy mala práctica. Por qué?
+NO TENEMOS CONTROL de la estructura de representación de esos datos.
+Es el proveedor el que genera esa estructura... y es libre de cambiarla en cualquier momento.
+
+    Jenkinis -> terraform <- Jenkins extraiga la IP -> Ansible
+
+    Script -> terraform -> provider 
+                            v1
+                            
+    terraform -> .tfstate {
+                                resources <- Lo rellena el provider
+                          }
+
+SOLUCION !
+Los outputs de terraform <<<<<
+
+Con los outputs tan solo añadimos dentro también del fichero .tfstate datos, que consultar posteriormente 
+o a pelo contra el fichero o con la gracia del comando terraform output.
+Pero el tema es que esos datos NO SE AÑADEN en el bbloque JSON "resources",
+sino en el bloque "outputs", cuya estructura la gestiono YO !!!
+Los outputs me ayudan a definir el API de mi programa (la forma en la que comunicarse con él) con
+en concreto la SALIDA de mi programa
+Y aunque haya un cambio en el proveedor, y ahora genere los datos de una forma distinta, 
+puedo reajustar dentro del script los outputs para que programas externos puedan
+seguir comunicandose conmigo de la misma forma. 
+LO CUAL FACILITA ENORMEMENTE EL MNTO DE MIS SCRIPTS!
+
+El día 1... quizás tengo un poquito más de trabajo.... NI AUN ASI
+Pero el día n, me ahorra un huevo inimaginable de trabajo y problemas!
