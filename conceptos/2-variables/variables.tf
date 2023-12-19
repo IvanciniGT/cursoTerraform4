@@ -99,8 +99,26 @@ variable "variables_puertos" {
                                 interno     =   number
                                 externo     =   number
                                 ip          =   optional(string, "127.0.0.1")
-                                protocolo   =   optional(string, "tcp")
+                                protocolo   =   optional(string, "tcp") # upd
                              }))
                     #list(map(string)) # Esta podría ser una solución (PERO DE MIERDA)... ya que terraform permite convertir entre string y number en automático
     nullable    = false
+    
+    validation {
+        condition       = alltrue( 
+                                    [ for puerto in var.variables_puertos: 
+                                        puerto.interno == ceil(puerto.interno) && puerto.externo == ceil(puerto.externo)
+                                    ] 
+                                 )
+        error_message   = "Lo puertos (tanto interno como externo) deben números enteros"
+    }
+    
+    validation {
+        condition       = alltrue( 
+                                    [ for puerto in var.variables_puertos: 
+                                        puerto.interno > 0 && puerto.externo > 0
+                                    ] 
+                                 )
+        error_message   = "Lo puertos (tanto interno como externo) deben ser mayores que cero"
+    }
 }
