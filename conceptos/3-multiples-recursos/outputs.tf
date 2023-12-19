@@ -19,3 +19,9 @@ output "inventario_de_contenedores" {
     value = join("\n",[ for contenedor in docker_container.mi-contenedor:
                 "${contenedor.name}=${contenedor.network_data[0].ip_address}" ] )
 }
+output "direcciones_ip_contenedores_personalizados" {
+                # Un mapa lo puedo iterar solo obteniendo los valores, u obteniendo tanto las claves como los valores
+                # Eso lo puedo hacer en cualquier sitio.
+    value = [ for nombre, contenedor in docker_container.mis-contenedores-personalizados:
+                "${nombre}=${contenedor.network_data[0].ip_address}" ]
+}

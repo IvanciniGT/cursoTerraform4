@@ -18,7 +18,7 @@ resource "docker_container" "mi-contenedor" {
     start        = var.arrancar_automaticamente
     
     dynamic "ports" { # permite generar blocks dinamicamente dentro de un resource
-        for_each = var.variables_puertos
+        for_each = var.variables_puertos # Lista o un set
         iterator = puerto
         content {
             internal = puerto.value.interno
