@@ -54,3 +54,31 @@ Obtener el valor de una variable:
 - Si terraform no encuentra valor para una variable, lo pide por consola
     Como os podeis imaginar esto rompe totalmente el concepto de AUTOMATIZACION 
 - Aun así, si no paso valor, se corta la moto....
+
+# Tipos de datos para variables:
+
+- string
+- number
+- bool
+- set(???)
+- list(???)
+- map(???)
+- object        Es como un map, en cuanto a sintaxis, pero:
+                    - Las claves vienen prefijadas
+                    - Asociado a cada clave, puedo poner mi tipo de datos
+                    - Hay claves que podemos definir como opcionales
+
+# Idempotencia!
+
+Independientemente del estado inicial, siempre llegue al mismo estado final.
+Y esto guarda una relación enroem con el hecho de usar un lenguaje DECLARATIVO !
+
+# Si tengo un script que ofrece idempotencia (y desde luego lo quiero así, ésto me lo regala terraform por el hecho de usar un lenguaje declarativo)
+
+Nada quita que no está lanzando este proceso todas las noches... o en respuesta a un evento de monitorización.
+
+NO TENGO NPI del uso que se dará a mi script.
+
+Tampoco controlo que alguien no haya metido la pata al rellenar un ficherito de variables.
+
+**CRITICO**: Ni de coña voy a montar un script de terraform que no haga un control lo más exhaustivo posible sobre los datos de partida!
