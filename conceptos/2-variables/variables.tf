@@ -134,7 +134,7 @@ variable "variables_puertos" {
         condition       = alltrue( 
                                     [ for puerto in var.variables_puertos: 
                                         length( regexall("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])(?:\\.(?:[01]?\\d\\d?|2[0-4]\\d|25[0-5])){3}(?:/[0-2]\\d|/3[0-2])?$", puerto.ip) ) == 1 
-                                ]
+                                    ]
                             )
         error_message   = "Las IPs de los puertos deben ser válidas (se admiten mascaras)."
     }
@@ -143,7 +143,7 @@ variable "variables_puertos" {
                                     [ for puerto in var.variables_puertos: 
 #                                        length( regexall("^(tcp|udp)$", puerto.protocolo) ) == 1
                                         contains( ["tcp","udp"], puerto.protocolo)
-                                ]
+                                    ]
                             )
         error_message   = "El protocolo debe ser tcp o udp"
     }
