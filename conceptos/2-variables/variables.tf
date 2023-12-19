@@ -12,7 +12,7 @@ variable "nombre_contenedor" {
         # En terraform tenemos un huevo y medio de funciones que podemos usar en las expresiones.
         #       https://developer.hashicorp.com/terraform/language/functions
         # Si se develve true, se entiende que el valor ha superado la validacion
-        condition       = length( regexall("^[a-zA-Z0-9_-]{5,}$", var.nombre_contenedor) ) == 1
+        condition       = length( regexall("^[a-zA-Z0-9_-]{5,20}$", var.nombre_contenedor) ) == 1
                                                                                         # Operadores: > < >= <= == != && || ! + - * /
         # Mensaje que se muestra cuando la condicion devuelve false, es decir, cuando no se ha superado la validación.
         # En este caso, terraform CORTA la ejecución de script... mostrando este mensaje.
@@ -121,4 +121,31 @@ variable "variables_puertos" {
                                  )
         error_message   = "Lo puertos (tanto interno como externo) deben ser mayores que cero"
     }
+    
+    validation {
+        condition       = alltrue( 
+                                    [ for puerto in var.variables_puertos: 
+                                        puerto.interno <= 65535 && puerto.externo <= 65535
+                                    ] 
+                                 )
+        error_message   = "Lo puertos (tanto interno como externo) deben ser menores que 65535"
+    }
+    validation {
+        condition       = alltrue( 
+                                    [ for puerto in var.variables_puertos: 
+                                        length( regexall("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])(?:\\.(?:[01]?\\d\\d?|2[0-4]\\d|25[0-5])){3}(?:/[0-2]\\d|/3[0-2])?$", puerto.ip) ) == 1 
+                                ]
+                            )
+        error_message   = "Las IPs de los puertos deben ser válidas (se admiten mascaras)."
+    }
+    validation {
+        condition       = alltrue( 
+                                    [ for puerto in var.variables_puertos: 
+#                                        length( regexall("^(tcp|udp)$", puerto.protocolo) ) == 1
+                                        contains( ["tcp","udp"], puerto.protocolo)
+                                ]
+                            )
+        error_message   = "El protocolo debe ser tcp o udp"
+    }
+
 }

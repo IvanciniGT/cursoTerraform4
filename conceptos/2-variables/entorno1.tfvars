@@ -6,8 +6,8 @@ variables_entorno        = {
                            }
 variables_puertos        = [
                                 {
-                                    interno = 80000
-                                    externo = -17
-                                    ip      = "300.300.300.ramon"
+                                    interno = 80
+                                    externo = 8080
+                                    ip      = "0.0.0.0"
                                 }
                             ]
