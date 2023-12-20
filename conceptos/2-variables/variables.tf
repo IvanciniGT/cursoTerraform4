@@ -101,7 +101,8 @@ variable "variables_puertos" {
                                 ip          =   optional(string, "127.0.0.1")
                                 protocolo   =   optional(string, "tcp") # upd
                              }))
-                    #list(map(string)) # Esta podría ser una solución (PERO DE MIERDA)... ya que terraform permite convertir entre string y number en automático
+                    #list(map(string)) # Esta podría ser una solución (PERO DE MIERDA)... ya que terraform 
+                                        # Si asigno un valor de tipo String a una propiedad de un recurso de tipo number, lo convierte en automático
     nullable    = false
     
     validation {

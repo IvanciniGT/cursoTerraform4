@@ -129,3 +129,41 @@ Querremos además:
 - queremos una variable llamada:
     - forzar_regeneracion, ya que en caso de existir os archivos, no deben generarse claves, sino leearlas de los archivos...
                             por defecto... si esta variable está en true, a tomar por culo los archivos que existan que generamos nuevas claves/archivos
+
+---
+
+VARIABLES:
+
+- una variable para el algoritmo, que incluya:   tipo de dato? mapa.... RUINA!
+    - nombre_algoritmo                              RSA
+            v
+        Validación CRUZADA.... dependiendo del algoritmo, así la configuración
+                                    RSA, que hay que poner en configuración? Un número
+                                    Pero si es ECDSA: P224, P256, P384, P521. 
+                                    Y en cambio si es ed25519... NADA
+            ^
+    - configuracion_algoritmo                       
+- directorio_ficheros_claves        √
+- forzar_regeneracion               √
+
+
+
+# ECDSA key with P384 elliptic curve
+resource "tls_private_key" "ecdsa-p384-example" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P384"
+}
+
+# RSA key of size 4096 bits
+resource "tls_private_key" "rsa-4096-example" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# ED25519 key
+resource "tls_private_key" "ed25519-example" {
+  algorithm = "ED25519"
+}
+
+
+
