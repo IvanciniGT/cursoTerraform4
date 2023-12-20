@@ -25,3 +25,12 @@ output "direcciones_ip_contenedores_personalizados" {
     value = [ for nombre, contenedor in docker_container.mis-contenedores-personalizados:
                 "${nombre}=${contenedor.network_data[0].ip_address}" ]
 }
+# Necesito pasar a mi cliente la ip que deben usar para conectar con el servicio que ofrezco
+# Si hay balanceador, la del balanceador, sino, la del unico contenedor que habré creado.
+output "ip_servicio_web" {
+#    value = (var.numero_contenedores > 1 ? docker_container.mi-balanceador[0].network_data[0].ip_address :
+#                                           docker_container.mi-contenedor[0].network_data[0].ip_address)
+    value = (local.quiero_balanceo ? docker_container.mi-balanceador[0] :
+                                     docker_container.mi-contenedor[0]
+            ).network_data[0].ip_address
+}

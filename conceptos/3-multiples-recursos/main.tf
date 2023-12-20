@@ -84,3 +84,32 @@ resource "docker_container" "mis-contenedores-mas-personalizados-2" {
         ip          = var.contenedores_mas_personalizados_otra_forma[count.index].ip
     }    
 }
+
+# Este recurso puede ser necesario o no.
+# Ahora no se trata de si creo 10 o 20: BUCLES
+# Sino de si lo creo o no: CONDICIONAL !
+# OJO: Desde el momento que estoy usando la palabra count,
+# La variable docker_container.mi-balanceador es una lista
+# Que en este caso tendrá 0 o 1 recurso.
+resource "docker_container" "mi-balanceador" {
+    count           = local.quiero_balanceo ? 1: 0
+    name            = "mi-balanceador"
+    image           = docker_image.mi-imagen.image_id
+    ports {
+        internal    = 80
+        external    = 8070
+        ip          = "0.0.0.0"
+    }    
+}
+
+# Esto me permite definir mis propias "variables" a usar dentro del script
+# Realmente no son variable como en otros lenguajes de programación
+# Lo que hago es definir una expresión que asocio a un nombre.
+# Cada vez que esccriba en mi script local.NOMBRE, se reemplaza por la expresión asociada y se evalua.
+# Los locals no se evaluan anticipadamente... ni una única vez...
+# Se evaluan cada vez que son utilizados.
+ # SOLO SON FORMAS DE REFERIRME A EXPRESIONES de manera simplificada
+locals {
+    # NOMBRE          # EXPRESION
+    quiero_balanceo = var.numero_contenedores > 1 # Tiene dentro un true o un false
+}

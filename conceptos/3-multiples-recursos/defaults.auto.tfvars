@@ -1,4 +1,4 @@
-numero_contenedores = 2
+numero_contenedores = 1
 contenedores_personalizados = {
     contenedorA = 8090
     contenedorB = 9090
