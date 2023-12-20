@@ -57,3 +57,8 @@ Entonces... vamos a usar los provisionadores? En algunos casos:
 
 En definitiva COSAS BASTANTE SENCILLAS
     
+---
+
+Quiero que a ejecutar mi script de terraform, se me genere un fichero con:
+nombre_contenedor=IP
+Pero... quiero poder generar 1 o 17 contenedores.. en base a la variable numero_contenedores
