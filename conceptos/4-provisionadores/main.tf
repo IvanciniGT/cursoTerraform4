@@ -33,9 +33,23 @@ resource "docker_container" "mi-contenedor" {
     # Funcionaría esto en windows? NO
     # Podemos elegir el intérprete de ejecución de nuestros comandos: sw, bash, ps1, cmd, python, perl
     provisioner "local-exec" {
-        interpreter = [ "/bin/bash" "-c" ]
-        command = "echo CONTENEDOR ELIMINADO: ${self.name}"
+        interpreter = [ "/bin/bash", "-c" ]
+        command = "echo La ip del contenedor:  ${self.name} es: ${self.network_data[0].ip_address} "
+    }
+    provisioner "local-exec" {
+        interpreter = [ "python" , "-c" ]
+        command = "print( 'La ip del contenedor: ${self.name} es: ${self.network_data[0].ip_address}')"
     }
     
+    provisioner "local-exec" {
+        interpreter = [ "python" , "-c" ]
+        # Terraform tiene una sintaxis especial para crear textos multilinea
+        # Esto lo puedo aplicar para rellenar CUALQUIER propiedad de tipo texto de mis recursos
+        # No solo para los comandos
+        command = <<-EOT
+                    print('La ip del contenedor: ${self.name}')
+                    print(' es: ${self.network_data[0].ip_address}')
+                    EOT
+    }
     
 }
