@@ -27,4 +27,15 @@ resource "docker_container" "mi-contenedor" {
         when = destroy # Con esto le indico a terraform que me ejecute el provisionador al borrar el recurso. 
         # De lo contrario se ejecutaría solo en su creación o modificación, como hemos visto arriba
     }
+
+    # Donde se ejecuta el comando? "/bin/sh" "-c"
+    # Y me interesa que se ejecute usando la sh como intérprete? QUIZAS SI... QUIZAS NO
+    # Funcionaría esto en windows? NO
+    # Podemos elegir el intérprete de ejecución de nuestros comandos: sw, bash, ps1, cmd, python, perl
+    provisioner "local-exec" {
+        interpreter = [ "/bin/bash" "-c" ]
+        command = "echo CONTENEDOR ELIMINADO: ${self.name}"
+    }
+    
+    
 }
