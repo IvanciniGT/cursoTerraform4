@@ -62,3 +62,70 @@ En definitiva COSAS BASTANTE SENCILLAS
 Quiero que a ejecutar mi script de terraform, se me genere un fichero con:
 nombre_contenedor=IP
 Pero... quiero poder generar 1 o 17 contenedores.. en base a la variable numero_contenedores
+
+---
+
+Mañana... pasado... vamos a crear unos servidores en un cloud.
+El primero que vamos a usar es aws.
+Lo primero que me pide un cloud al crear un servidor linux es? clave ssh
+
+Tengo clave ssh por ahí? NO
+
+Vamos a montar un script para generar claves ssh, que poder usar posteriormente en nuestros despliegues de infra.
+Vamos a darle un poco de gracia eso si... pero lo unico que quiero generar es un par de claves (publica, privada)
+
+Para ello, nos ayudaremos de un provider que ofrece hashicorp: TLS
+---
+terraform {
+  required_providers {
+    tls = {
+      source = "hashicorp/tls"
+      version = "4.0.5"
+    }
+  }
+}
+
+provider "tls" {
+  # Configuration options
+}
+---
+# ECDSA key with P384 elliptic curve
+resource "tls_private_key" "ecdsa-p384-example" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P384"
+}
+
+# RSA key of size 4096 bits
+resource "tls_private_key" "rsa-4096-example" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# ED25519 key
+resource "tls_private_key" "ed25519-example" {
+  algorithm = "ED25519"
+}
+
+private_key_openssh
+private_key_pem
+
+public_key_openssh
+public_key_pem
+---
+
+En esto en principio sería todo... aunque....
+Querremos además:
+- tener una variable con la que controlar el algoritmo... validada
+- tener una(s) variable para la configuración del algoritmo... validada
+- quiero que las claves se guarden en sus respectivos archivos
+    - tendre una variable con el directorio donde dejar esos archivos
+    - dentro se generarán los archivos: 
+        -   private_key.openssh
+        -   private_key.pem
+        -   public_key.openssh
+        -   public_key.pem
+- además, esos 4 datos se debe ofrecer como outputs
+- y....
+- queremos una variable llamada:
+    - forzar_regeneracion, ya que en caso de existir os archivos, no deben generarse claves, sino leearlas de los archivos...
+                            por defecto... si esta variable está en true, a tomar por culo los archivos que existan que generamos nuevas claves/archivos
