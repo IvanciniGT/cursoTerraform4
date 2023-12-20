@@ -1,4 +1,7 @@
 locals {
+
+    nombre_algoritmo                                = upper(var.algoritmo.nombre)
+
     directorio_ficheros_claves_acabando_en_barra    = ( endswith(var.directorio_ficheros_claves, "/") 
                                                          ? var.directorio_ficheros_claves
                                                          : "${var.directorio_ficheros_claves}/" )

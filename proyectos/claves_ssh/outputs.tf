@@ -1,7 +1,5 @@
 output "claves" {
-    # Aqui nos dará un errorcito cuando ejecutemos... pero ya lo arreglaremos
-    # No es nada que esté mal.. está perfecto
-    # Solo que falta una cosita más que aún no os he contado.
+    sensitive   = true # Y así las claves no salen en los logs
     value       = (
                     local.se_generan_claves 
                       ? { # Las relleno desde el recurso que las genera
