@@ -168,3 +168,10 @@ Wordpress DESARROLLO - Mi Primo's blog
 
 Igual que el script tendrá sus propias variables, independientes de las de los módulos que use
 El script también tendra sus propios outputs independientes de los del modulo
+
+----
+
+# DATA
+
+El elemento data, dentro de los ficheros (scripts) de terraform nos permite hacer una búsqueda automatizada
+en el proveedor (query)
