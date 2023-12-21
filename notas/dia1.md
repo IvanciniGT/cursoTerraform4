@@ -169,7 +169,8 @@ En esos archivos vamos a encontrar distintos tipos de elementos configurados:
 que usamos en otros lenguajes de programación.                                                      JUEVES
 - resources > provisioners                                                                          JUEVES
 - data                                                                                              VIERNES (cloud)
-- modules                                                                                           JUEVES
+- modules:  Son paquetes de recursos que puedo reutilizar.                                          JUEVES
+            Lo que sería en otros lenguajes una FUNCION     
 
 La sintaxis de estos archivos HCL es extraña... una mezcla entre JSON y YAML... pero no es ni JSON ni YAML.... con toques del lenguaje de programación GO.
 
@@ -179,7 +180,7 @@ Es un programa que se encarga de ejecutar comandos sobre los scripts de terrafor
 
 Qué tipo de comandos:
 - init          Descargar los proveedores que necesita mi script.
-                Otra cosita... que veremos más adelante.
+                Y los módulos!
 - validate      Validar que mi script está bien escrito.
 - refresh
 - plan          Planificar las tareas que hay que realizar para llevar el sistema al estado final que le he dicho...
