@@ -29,6 +29,7 @@ variable "forzar_regeneracion" {
     description     = "Indica si aun a pesar de existir ficheros de claves previos en el `directorio_ficheros_claves`, se deben generar y exportar nuevas claves"
     type            = bool
     nullable        = false
+    default         = false
 }
 
 variable "algoritmo" {
@@ -38,7 +39,10 @@ variable "algoritmo" {
                                 configuracion   =   optional(string) # Si al poner optional no pongo valor por defecto, se toma como valor por defecto null
                              })
     nullable        = false
-    
+    default         = {
+                        nombre          =   "rsa"
+                        configuracion   =   4096
+                      }
     validation{
         condition       = contains( ["RSA", "ECDSA", "ED25519"], upper(var.algoritmo.nombre) ) 
         error_message   = "El nombre del algoritmo debe ser: RSA, ECDSA, ED25519"
