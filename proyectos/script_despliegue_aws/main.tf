@@ -1,4 +1,4 @@
-module "claves" {
+module "mis_claves" {
     source                      = "../modulo_claves_ssh"
     directorio_ficheros_claves  = "./claves"
 }
@@ -28,11 +28,74 @@ data "aws_ami" "imagen_del_servidor" {
 }
 
 resource "aws_instance" "web" {
-  ami           = data.aws_ami.imagen_del_servidor.image_id  # "ami-0905a3c97561e0b69"
-  instance_type = "t2.micro"
-
+  ami             = data.aws_ami.imagen_del_servidor.image_id  # "ami-0905a3c97561e0b69"
+  instance_type   = "t2.micro"
+  key_name        = aws_key_pair.clave_en_aws.key_name # Esto fuerza la dependencia en el grafo
+  security_groups = [ aws_security_group.reglas_firewall_red.name ]
   tags = {
     Name = "${var.nombre_despliegue}-servidor"
+  }
+  
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command =<<EOT
+                count=20
+                demora=2
+                for (( i=0; i<=count; i++ ))
+                do
+                  echo "Intento de ping $i"
+                  ping -c 1 ${self.public_ip}
+                  [[ $? == 0 ]] && exit 0 || echo "Ping fallido"
+                  sleep $demora
+                done
+                exit 1
+               EOT
+  }
+}
+
+resource "aws_key_pair" "clave_en_aws" {
+  key_name   = "${var.nombre_despliegue}-claves"
+  public_key = module.mis_claves.claves.publica.openssh
+}
+
+# No tengo claves ... bueno si las tengo , gracias a mi módulo... pero no se las he puesto a la máquina
+# La máquina si tiene red (dios mediante)... pero todas las comunicaciones cerradas (SECURITY GROUP)
+
+resource "aws_security_group" "reglas_firewall_red" {
+  name        = "${var.nombre_despliegue}-reglas-firewall-red-servidor-web"
+  description = "Abrir los puertos adecuados"
+
+  ingress {
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  ingress {
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  ingress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "${var.nombre_despliegue}-reglas-firewall-red-servidor-web"
   }
 }
 
