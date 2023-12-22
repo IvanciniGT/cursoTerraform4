@@ -4,8 +4,8 @@ arrancar_automaticamente = true
 imagen_contenedor_repo   = "nginx"
 imagen_contenedor_tag    = "latest"
 variables_entorno        = {
-                                "VAR1" = "value1"
-                                "VAR2" = "value2"
+                                "VARIABLE1" = "value1"
+                                "VARIABLE2" = "value2"
                            }
                            # Por defecto lo suyo sería: {}
                             # ["VAR1=valor1", "VAR1=valor2"]
