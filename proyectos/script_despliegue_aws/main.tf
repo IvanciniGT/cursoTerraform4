@@ -28,8 +28,20 @@ data "aws_ami" "imagen_del_servidor" {
 }
 
 locals {
-  nombre_servidor = "${var.nombre_despliegue}-servidor"    
+  existe_ya_el_servidor = length(data.aws_instances.saber_si_la_instancia_existe.ids) == 1
+  id_servidor_existente = data.aws_instances.saber_si_la_instancia_existe.ids[0]
+  nombre_servidor       = "${var.nombre_despliegue}-servidor"    
+  imagen_servidor       = ( local.existe_ya_el_servidor   
+                              ? var.recrear_el_servidor_si_nueva_imagen                       # Y me piden recrearlo si hay un cambio de imagen 
+                                  ? data.aws_ami.imagen_del_servidor.image_id                 # Pongo la nueva imagen
+                                  : data.aws_instance.instancia_existente[0].ami              # Caso contrario, la que tiene el actual, para que no se recree
+                              : data.aws_ami.imagen_del_servidor.image_id                     # Y si no existia... la que haya ahora.
+                          )
 }
+                    # ( length(data.aws_instances.saber_si_la_instancia_existe.ids) == 1 && ! var.recrear_el_servidor_si_nueva_imagen     # Y me piden recrearlo si hay un cambio de imagen 
+                    #        ? data.aws_instance.instancia_existente[0].ami  # Caso contrario, la que tiene el actual, para que no se recree
+                    #    : data.aws_ami.imagen_del_servidor.image_id  # Y si no existia... la que haya ahora.
+                    #)
 
 data "aws_instances" "saber_si_la_instancia_existe" {
   filter {
@@ -39,21 +51,12 @@ data "aws_instances" "saber_si_la_instancia_existe" {
 }
 
 data "aws_instance" "instancia_existente" {
-  count    = length(data.aws_instances.saber_si_la_instancia_existe.ids) # == 1 ? 1: 0
-  instance_id = data.aws_instances.saber_si_la_instancia_existe.ids[0]
+  count    = local.existe_ya_el_servidor ? 1 : 0
+  instance_id = local.id_servidor_existente
 }
 
 resource "aws_instance" "web" {
-  ami             = ( length(data.aws_instances.saber_si_la_instancia_existe.ids) == 1  # Si existe el servidor
-                        ? var.recrear_el_servidor_si_nueva_imagen     # Y me piden recrearlo si hay un cambio de imagen 
-                            ? data.aws_ami.imagen_del_servidor.image_id # Pongo la nueva imagen
-                            : data.aws_instance.instancia_existente[0].ami  # Caso contrario, la que tiene el actual, para que no se recree
-                        : data.aws_ami.imagen_del_servidor.image_id  # Y si no existia... la que haya ahora.
-                    )
-                    # ( length(data.aws_instances.saber_si_la_instancia_existe.ids) == 1 && ! var.recrear_el_servidor_si_nueva_imagen     # Y me piden recrearlo si hay un cambio de imagen 
-                    #        ? data.aws_instance.instancia_existente[0].ami  # Caso contrario, la que tiene el actual, para que no se recree
-                    #    : data.aws_ami.imagen_del_servidor.image_id  # Y si no existia... la que haya ahora.
-                    #)
+  ami             = local.imagen_servidor
   instance_type   = "t2.micro"
   key_name        = aws_key_pair.clave_en_aws.key_name # Esto fuerza la dependencia en el grafo
   security_groups = [ aws_security_group.reglas_firewall_red.name ]
