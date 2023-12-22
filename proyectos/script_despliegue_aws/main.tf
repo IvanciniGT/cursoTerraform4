@@ -27,29 +27,38 @@ data "aws_ami" "imagen_del_servidor" {
   }
 }
 
+locals {
+  nombre_servidor = "${var.nombre_despliegue}-servidor"    
+}
+
+data "aws_instances" "saber_si_la_instancia_existe" {
+  filter {
+    name   = "tag:Name"
+    values = [ local.nombre_servidor ]
+  }
+}
+
+data "aws_instance" "instancia_existente" {
+  count    = length(data.aws_instances.saber_si_la_instancia_existe.ids) # == 1 ? 1: 0
+  instance_id = data.aws_instances.saber_si_la_instancia_existe.ids[0]
+}
+
 resource "aws_instance" "web" {
-  ami             = data.aws_ami.imagen_del_servidor.image_id  # "ami-0905a3c97561e0b69"
+  ami             = ( length(data.aws_instances.saber_si_la_instancia_existe.ids) == 1  # Si existe el servidor
+                        ? var.recrear_el_servidor_si_nueva_imagen     # Y me piden recrearlo si hay un cambio de imagen 
+                            ? data.aws_ami.imagen_del_servidor.image_id # Pongo la nueva imagen
+                            : data.aws_instance.instancia_existente[0].ami  # Caso contrario, la que tiene el actual, para que no se recree
+                        : data.aws_ami.imagen_del_servidor.image_id  # Y si no existia... la que haya ahora.
+                    )
+                    # ( length(data.aws_instances.saber_si_la_instancia_existe.ids) == 1 && ! var.recrear_el_servidor_si_nueva_imagen     # Y me piden recrearlo si hay un cambio de imagen 
+                    #        ? data.aws_instance.instancia_existente[0].ami  # Caso contrario, la que tiene el actual, para que no se recree
+                    #    : data.aws_ami.imagen_del_servidor.image_id  # Y si no existia... la que haya ahora.
+                    #)
   instance_type   = "t2.micro"
   key_name        = aws_key_pair.clave_en_aws.key_name # Esto fuerza la dependencia en el grafo
   security_groups = [ aws_security_group.reglas_firewall_red.name ]
   tags = {
-    Name = "${var.nombre_despliegue}-servidor"
-  }
-  
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    command =<<EOT
-                count=20
-                demora=2
-                for (( i=0; i<=count; i++ ))
-                do
-                  echo "Intento de ping $i"
-                  ping -c 1 ${self.public_ip}
-                  [[ $? == 0 ]] && exit 0 || echo "Ping fallido"
-                  sleep $demora
-                done
-                exit 1
-               EOT
+      Name = local.nombre_servidor
   }
 }
 
@@ -99,6 +108,14 @@ resource "aws_security_group" "reglas_firewall_red" {
   }
 }
 
+module "prueba_servidor" {
+  source        = "./modules/test"
+  ip            = aws_instance.web.public_ip
+  usuario       = "ubuntu"
+  clave_privada = module.mis_claves.claves.privada.pem
+  id_servidor   = aws_instance.web.id
+  ejecutar_pruebas_si_el_servidor_no_se_ha_creado = true
+}
 
 # AMI:
 #ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20231207
