@@ -12,7 +12,7 @@ variable "nombre_contenedor" {
         # En terraform tenemos un huevo y medio de funciones que podemos usar en las expresiones.
         #       https://developer.hashicorp.com/terraform/language/functions
         # Si se develve true, se entiende que el valor ha superado la validacion
-        condition       = length( regexall("^[a-zA-Z0-9_-]{5,20}$", var.nombre_contenedor) ) == 1
+        condition       = length( regexall("^[a-zA-Z][a-zA-Z0-9_-]{5,20}$", var.nombre_contenedor) ) == 1
                                                                                         # Operadores: > < >= <= == != && || ! + - * /
         # Mensaje que se muestra cuando la condicion devuelve false, es decir, cuando no se ha superado la validación.
         # En este caso, terraform CORTA la ejecución de script... mostrando este mensaje.
@@ -31,7 +31,7 @@ variable "uso_cpu" {
                   # La variable, además de contener datos de su tipo, en este caso números,
                   # tambien puede contener el valor null, que es un valor que existe en terraform
                  
-    validation {
+    validation {                             
         condition       = var.uso_cpu == null ? true : ( ceil(var.uso_cpu) == var.uso_cpu && var.uso_cpu > 0 )
                          # Operador ternaario de terraform: Es un condicional en linea, lo teneis también en la mayoría de lenguajes de programación
                          # (condicion) ? (valor si se cumple) : (valor si no se cumple)

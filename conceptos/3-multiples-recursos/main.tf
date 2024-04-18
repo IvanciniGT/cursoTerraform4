@@ -50,6 +50,7 @@ resource "docker_container" "mis-contenedores-personalizados" {
                       # each.value: Va tomando como valor cada uno de los valores del mapa
     name            = each.key
     image           = docker_image.mi-imagen.image_id
+
     ports {
         internal    = 80
         external    = each.value

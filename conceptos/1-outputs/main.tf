@@ -88,3 +88,5 @@ resource "docker_image" "mi-imagen" {
     # docker_image.mi-imagen
 # OJO: LO QUE SE GENERA es un grafo de DEPENDENCIAS. No de FLUJO
 # Los grafos de dependencias se leen al revés (las flechas para el otro lado)
+
+

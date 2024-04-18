@@ -67,6 +67,9 @@ resource "aws_instance" "web" {
     network_interface_id = aws_network_interface.interfaz.id
     device_index         = 0
   }
+  #depends_on = [ # FATAL... puedo hacerlo de forma más sencilla y directa!.., REFERENCIANDO EL RECURSO en el key_name
+  #  aws_key_pair.clave_en_aws
+  #]
 
 }
 
